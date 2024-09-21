@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-image: url("s_images/booking_background.jpg");
+            font-family: Arial, sans-serif;
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            z-index: 1;
+        }
+        header a.logo {
+            text-align: left;
+        }
+        header img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 50%;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+            width: 100%;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            display: block;
+            align-items: center;
+        }
+        .payment-info {
+            margin-top: 100px;
+            text-align: center;
+        }
+        .payment-info h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: black;
+        }
+        .payment-info p {
+            font-size: 18px;
+            color: black;
+        }
+        .payment-info label {
+            font-size: 18px;
+            color: black;
+        }
+        .payment-info input[type="text"],
+        .payment-info input[type="number"],
+        .payment-info input[type="password"],
+        .payment-info select {
+            font-size: 18px;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            display: block;
+            width: calc(100% - 20px);
+            max-width: 300px;
+            margin: 10px auto;
+        }
+        .payment-info button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .payment-info button:hover {
+            background-color: darkgreen;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('payment-form');
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                
+                const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+                const paymentData = {
+                    paymentMethod: form.elements['paymentMethod'].value,
+                    
+                };
+
+                const data = { cartItems, paymentData };
+
+                fetch('/submit-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        localStorage.removeItem('cartItems'); 
+                        window.location.href = 'order_confirmation.html'; 
+                    } else {
+                        throw new Error('Payment submission failed');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <a href="iPlant.html" class="logo"><img src="h_images/logo.png"></a>
+        </div>
+    </header>
+    <div class="container">
+        <div class="payment-info">
+            <h1>Payment Portal</h1>
+            <form id="payment-form">
+                <label for="paymentMethod">Payment Method:</label>
+                <select id="paymentMethod" name="paymentMethod">
+                    <option value="creditCard">Credit Card</option>
+                    <option value="debitCard">Debit Card</option>
+                    <option value="upi">UPI</option>
+                    <option value="cod">Cash on Delivery</option>
+                </select>
+                
+                <button type="submit">Submit Payment</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
